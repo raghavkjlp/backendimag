@@ -23,6 +23,14 @@ app.get('/api/images', async (req, res) => {
   try {
     const { folder } = req.query;
 
+    // ── Anti-cache headers — ensures users always get fresh data ──
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store'
+    });
+
     // Set up search parameters
     const searchParams = {
       limit: 500
