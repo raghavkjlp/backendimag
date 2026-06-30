@@ -8,7 +8,22 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.static('./')); // Serve static files from the current directory
+
+// Serve static files with anti-cache headers to ensure users always see the latest changes
+app.use(express.static('./', {
+  setHeaders: (res, path, stat) => {
+    if (path.endsWith('.html')) {
+      // For HTML pages, force no-cache so the client always fetches the latest version
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else if (path.endsWith('.css') || path.endsWith('.js')) {
+      // For CSS/JS, revalidate with ETag to pick up modifications immediately
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    }
+  }
+}));
+
 app.use(express.json());
 
 // ImageKit Configuration
